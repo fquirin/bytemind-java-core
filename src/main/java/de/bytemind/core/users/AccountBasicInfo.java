@@ -14,6 +14,7 @@ import de.bytemind.core.tools.JSON;
  */
 public class AccountBasicInfo {
 	
+	//note: identical with webservice.AccountMapper
 	public static final String EMAIL = "Email"; 		//upper-case because its an ID type
 	public static final String PHONE = "Phone";			//upper-case because its an ID type
 	public static final String LANGUAGE = "language";

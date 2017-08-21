@@ -323,7 +323,7 @@ public final class JSON {
 		}
 	}
 	/**
-	 * Get a JSONArray.
+	 * Get a JSONArray or null.
 	 */
 	public static JSONArray getJArray(JSONObject jObject, String key){
 		return (JSONArray) jObject.get(key);
