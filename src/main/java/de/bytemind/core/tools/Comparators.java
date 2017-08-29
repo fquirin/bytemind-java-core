@@ -1,8 +1,13 @@
 package de.bytemind.core.tools;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.json.simple.JSONObject;
 
@@ -13,6 +18,30 @@ import org.json.simple.JSONObject;
  *
  */
 public class Comparators {
+	
+	/**
+	 * Sort map by value.
+	 * @param map - unsorted map
+	 * @return new sorted LinkedHashMap
+	 */
+	public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> sortMapByValue(Map<K, V> map, boolean reverseOrder){
+		Stream<Entry<K, V>> stream;
+		if (!reverseOrder){
+			stream = map.entrySet()
+	              .stream()
+	              .sorted(Map.Entry.comparingByValue());
+		}else{
+			stream = map.entrySet()
+		           .stream()
+		           .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()));
+		}
+		return stream.collect(Collectors.toMap(
+	                Map.Entry::getKey, 
+	                Map.Entry::getValue, 
+	                (e1, e2) -> e1, 
+	                LinkedHashMap::new
+	              ));
+	}
 	
 	/**
 	 * A comparator that takes one or two keys in the JSONObject and compares their long values. Secondary will be used when primary keys are
