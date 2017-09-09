@@ -62,7 +62,7 @@ public class DateTime {
 	 */
 	public static String getUTC(String format){
 		Date date = new Date();
-		return getGMT(date, format);
+		return getUTC(date, format);
 	}
 	/**
 	 * Get a custom formatted string with the UTC Time/Date of the given "date".
