@@ -36,11 +36,14 @@ public final class FilesAndStreams {
 	/**
 	 * Get an ArrayList of "File"s from a directory path.
 	 * @param directoryName - path to directory
-	 * @param files - ArrayList of files to populate
+	 * @param files - ArrayList of files to populate (or null to create new)
 	 * @param doSubfolders - include sub-folders?
 	 * @return list or null
 	 */
 	public static ArrayList<File> directoryToFileList(String directoryName, ArrayList<File> files, boolean doSubfolders) {
+		if (files == null){
+			files = new ArrayList<>();
+		}
 		File directory = new File(directoryName);
 	
 	    // get all the files from a directory

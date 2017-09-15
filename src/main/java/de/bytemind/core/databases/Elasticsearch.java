@@ -384,9 +384,7 @@ public class Elasticsearch implements KnowledgeDatabase {
 	}
 	/**
 	 * Delete anything.
-	 * @param index - index name, e.g. "account"
-	 * @param type - type name, e.g. "user"
-	 * @param id - id name/number, e.g. user_id
+	 * @param path - path to index or index/type or whatever (required)
 	 * @return error code (0 - no error, 1 - no connection or fail)
 	 */
 	public int deleteAny(String path){
@@ -511,6 +509,41 @@ public class Elasticsearch implements KnowledgeDatabase {
 			}else{
 				Debugger.println("customPUT - ElasticSearch - error in '" + path + "': " + result.toJSONString(), 1);
 				Statistics.addInternalApiHit(API_NAME + ":" + "customPUT" + "-error", tic);
+				return result;
+			}
+		//error
+		}catch (Exception e){
+			JSONObject res = new JSONObject();
+			JSON.add(res, "error", "request failed! - e: " + e.getMessage());
+			JSON.add(res, "code", -1);
+			return res;
+		}
+	}
+	
+	/**
+	 * Delete anything.
+	 * @param server - ES end-point URL
+	 * @param path - path to index or index/type or whatever (required)
+	 * @return raw JSON result or JSON with "error"
+	 */
+	public static JSONObject customDELETE(String server, String path){
+		//Build URL
+		if (!path.endsWith("/") && !path.isEmpty()) { path = path + "/"; }
+		String url = server + "/" + path;
+		try{
+			long tic = System.currentTimeMillis();
+			JSONObject result = Connectors.httpDELETE(url);
+			//System.out.println(result.toJSONString()); 		//debug
+			
+			//success?
+			if (Connectors.httpSuccess(result)){
+				Statistics.addInternalApiHit(API_NAME + ":" + "customDELETE", tic);
+				return result;
+	
+			//error
+			}else{
+				Debugger.println("customDELETE - ElasticSearch - error in '" + path + "': " + result.toJSONString(), 1);
+				Statistics.addInternalApiHit(API_NAME + ":" + "customDELETE" + "-error", tic);
 				return result;
 			}
 		//error

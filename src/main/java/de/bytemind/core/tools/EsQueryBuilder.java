@@ -122,6 +122,21 @@ public class EsQueryBuilder {
 	}
 	
 	/**
+	 * Build a query that must match some elements and must NOT match another set of query elements  
+	 */
+	public static JSONObject getBoolMustAndMustNotMatch(List<QueryElement> mustMatches, List<QueryElement> mustNotMatches){
+		JSONArray must = new JSONArray();
+		JSONArray mustNot = new JSONArray();
+		for (QueryElement qe : mustMatches){
+			JSON.add(must, qe.getAsMatch());
+		}
+		for (QueryElement qe : mustNotMatches){
+			JSON.add(mustNot, qe.getAsMatch());
+		}
+		return JSON.make("query", JSON.make("bool", JSON.make("must", must, "must_not", mustNot)));
+	}
+	
+	/**
 	 * Make a query that is a mix of several root matches and several nested matches (that are all in the same nest-path).
 	 * Note: Multiple nested paths are not yet supported.  
 	 * @param rootMatches - matches on root level
