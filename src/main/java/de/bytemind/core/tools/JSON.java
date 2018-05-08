@@ -3,6 +3,7 @@ package de.bytemind.core.tools;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import org.json.simple.JSONArray;
@@ -413,16 +414,77 @@ public final class JSON {
 		return obj;
 	}
 	/**
-	 * Simple add. Just adding an object with key to JSONObject
+	 * Set the value of a certain field by following the path given with dots in 'key', e.g.<br>
+	 * level1.level2.key -> { "level1" : { "level2" : { "key" : value } } }.<br>
+	 * This will add new fields to the JSONObject as required.
+	 * @param obj - JSONObject to add data to
+	 * @param key - path given with dots or just a key
+	 * @param value - value to write at the end of the path
+	 * @return the given JSONObject with added data
+	 */
+	@SuppressWarnings("unchecked")
+	public static JSONObject putWithDotPath(JSONObject obj, String key, Object value){
+		if(key.contains(".")){
+			String[] path = key.split("\\.");
+			if (path.length == 2){
+				if (obj.containsKey(path[0])){
+					((JSONObject) obj.get(path[0])).put(path[1], value);
+				}else{
+					obj.put(path[0], make(path[1], value));
+				}
+			}else{
+				if (obj.containsKey(path[0])){
+					putWithPath((JSONObject) obj.get(path[0]), Arrays.copyOfRange(path, 1, path.length), value);
+				}else{
+					JSONObject nextObj = new JSONObject();
+					obj.put(path[0], nextObj);
+					putWithPath(nextObj, Arrays.copyOfRange(path, 1, path.length), value);
+				}
+			}
+		}else{
+			obj.put(key, value);
+		}
+		return obj;
+	}
+	/**
+	 * Set the value of a certain field by following the given 'path', e.g.<br>
+	 * path[0]="level1", path[1]="level2" -> { "level1" : { "level2" : value } }.<br>
+	 * Works well together with 'putWithDotPath'.<br>
+	 * This will add new fields to the JSONObject as required.
+	 * @param obj - JSONObject to add data to
+	 * @param path - path given as array
+	 * @param value - value to write at the end of the path
+	 * @return the given JSONObject with added data
+	 */
+	@SuppressWarnings("unchecked")
+	public static JSONObject putWithPath(JSONObject obj, String[] path, Object value){
+		if (path.length == 2){
+			if (obj.containsKey(path[0])){
+				((JSONObject) obj.get(path[0])).put(path[1], value);
+			}else{
+				obj.put(path[0], make(path[1], value));
+			}
+		}else{
+			if (obj.containsKey(path[0])){
+				putWithPath((JSONObject) obj.get(path[0]), Arrays.copyOfRange(path, 1, path.length), value);
+			}else{
+				JSONObject nextObj = new JSONObject();
+				obj.put(path[0], nextObj);
+				putWithPath(nextObj, Arrays.copyOfRange(path, 1, path.length), value);
+			}
+		}
+		return obj;
+	}
+	/**
+	 * Simple add (same as put, ... historic reasons ...). 
+	 * Just adding an object with key to JSONObject
 	 * @param obj - JSONObject to add stuff to
 	 * @param key - key value
 	 * @param add - object to add at key position
 	 * @return JSONObject with added key value pair
 	 */
-	@SuppressWarnings("unchecked")
 	public static JSONObject add(JSONObject obj, String key, Object add){
-		obj.put(key, add);
-		return obj;
+		return put(obj, key, add);
 	}
 	/**
 	 * Simple add. Just adding an object with key to JSONArray

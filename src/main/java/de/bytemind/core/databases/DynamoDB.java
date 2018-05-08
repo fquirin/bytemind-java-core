@@ -33,7 +33,7 @@ public class DynamoDB implements KeyValueDatabase {
 	
 	@Override
 	public boolean testConnection() {
-		JSONObject test = DynamoDB.listTables();
+		JSONObject test = listTables();
 		if (Connectors.httpSuccess(test)){
 			return test.containsKey("TableNames");
 		}else{
@@ -65,12 +65,12 @@ public class DynamoDB implements KeyValueDatabase {
 	@Override
 	public JSONObject setValue(String table, String primeIndexName, String primeIndexValue, String key,	Map<String, Object> value) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("Not implemented yet!");
 	}
 	@Override
 	public JSONObject setValue(String table, String primeIndexName, String primeIndexValue, String key,	List<Object> value) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("Not implemented yet!");
 	}
 	public JSONObject setObjectValue(String table, String primeIndexName, String primeIndexValue, String key, Object value){
 		String[] keys = new String[]{ key };

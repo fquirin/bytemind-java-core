@@ -407,6 +407,68 @@ public class Elasticsearch implements KnowledgeDatabase {
 			return 1;
 		}
 	}
+	/**
+	 * Remove field of document at index/type/id.
+	 * @param index - index name, e.g. "account"
+	 * @param type - type name, e.g. "user"
+	 * @param id - id name/number, e.g. user_id
+	 * @param field - field in document to remove (can contain "." for fields of objects)
+	 * @return error code: 0 (all good) or 1 (connection error)
+	 */
+	public int deleteFromDocument(String index, String type, String id, String field){		
+		//headers
+		HashMap<String, String> headers = new HashMap<String, String>();
+		headers.put("Content-Type", "application/json");
+		
+		//Build URL
+		String url = server + "/" + index + "/" + type + "/" + id + "/_update";
+		long tic = System.currentTimeMillis();
+		
+		JSONObject data;
+		if (field.contains(".")){
+			String[] paths = field.split("\\.");
+			String path = "";
+			String pathField = "";
+			if (paths.length == 2){
+				path = "." + paths[0];
+				pathField = paths[1];
+			}else{
+				for (int i=0; i<paths.length-1; i++){
+					path += ("." + paths[i]); 
+				}
+				pathField = paths[paths.length-1];
+			}
+			String inline = "ctx._source" + path + ".remove(params.remField)";
+			data = JSON.make("script", JSON.make(
+					"inline", inline,
+					"params", JSON.make("remField", pathField),
+					"lang", "painless"
+				)
+			);
+		}else{
+			data = JSON.make("script", JSON.make(
+					"inline", "ctx._source.remove(params.remField)",
+					"params", JSON.make("remField", field),
+					"lang", "painless"
+				)
+			);
+		}
+		
+		JSONObject result = Connectors.httpPOST(url, data.toJSONString(), headers);
+		//System.out.println(result.toJSONString()); 		//debug
+		
+		//success?
+		if (Connectors.httpSuccess(result)){
+			Statistics.addInternalApiHit(API_NAME + ":" + "deleteFromDocument", tic);
+			return 0;
+		}
+		//error
+		else{
+			Debugger.println("deleteFromDocument - ElasticSearch - error in '" + index + "/" + type + "': " + result.toJSONString(), 1);
+			Statistics.addInternalApiHit(API_NAME + ":" + "deleteFromDocument" + "-error", tic);
+			return 1;
+		}
+	}
 	
 	//Statics:
 	
